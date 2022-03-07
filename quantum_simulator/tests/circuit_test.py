@@ -45,6 +45,7 @@ def test_cx():
     qc.cx(4,2)
 
     sv = simulator.get_statevector(qc)
+    print(sv)
 
     ans = np.array([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0.70710678+0.j, 0, 0, 0, 0, 0,

@@ -25,7 +25,8 @@ class Gate:
         operations = [identity]*n_qbits
         operations[self.qbits[0]] = unitary
 
-        return ft.reduce(lambda x, y: np.kron(x, y), operations)
+        return ft.reduce(lambda x, y: np.kron(x, y), operations[::-1])
+        #return ft.reduce(lambda x, y: np.kron(x, y), operations)
 
     def get_qbits(self) -> np.array:
         return self.qbits
@@ -137,8 +138,10 @@ class CX(Gate):
         operations_one[self.qbits[0]] = np.outer(ket_one, ket_one)
         operations_one[self.qbits[1]] = unitary
 
-        return ft.reduce(lambda x, y: np.kron(x, y), operations_zero) + \
-               ft.reduce(lambda x, y: np.kron(x, y), operations_one)
+        return ft.reduce(lambda x, y: np.kron(x, y), operations_zero[::-1]) + \
+                ft.reduce(lambda x, y: np.kron(x, y), operations_one[::-1])
+        #return ft.reduce(lambda x, y: np.kron(x, y), operations_zero) + \
+        #       ft.reduce(lambda x, y: np.kron(x, y), operations_one)
 
 class SWAP(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
@@ -171,8 +174,10 @@ class CZ(Gate):
         operations_one[self.qbits[0]] = np.outer(ket_one, ket_one)
         operations_one[self.qbits[1]] = unitary
 
-        return ft.reduce(lambda x, y: np.kron(x, y), operations_zero) + \
-               ft.reduce(lambda x, y: np.kron(x, y), operations_one)
+        return ft.reduce(lambda x, y: np.kron(x, y), operations_zero[::-1]) + \
+                ft.reduce(lambda x, y: np.kron(x, y), operations_one[::-1])
+        #return ft.reduce(lambda x, y: np.kron(x, y), operations_zero) + \
+        #       ft.reduce(lambda x, y: np.kron(x, y), operations_one)
 
 class Measurement(Gate):
     def __init__(self, qbits: list[int], cbits: list[int], **kwargs):
