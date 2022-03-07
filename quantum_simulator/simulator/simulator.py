@@ -2,8 +2,9 @@
 Quantum System Simulator
 """
 
-import numpy as np
 import random
+import numpy as np
+import scipy.sparse as sparse
 from quantum_simulator.circuit import QuantumCircuit
 
 class Simulator():
@@ -12,11 +13,11 @@ class Simulator():
         Method that find the resulting statevector from a quantum circuit and returns it.
         """
         n_qbits = qc.get_number_of_qubits()
-        initial_state = np.zeros(2**n_qbits, dtype="complex128")
+        initial_state = sparse.dok_matrix((2**n_qbits,1), dtype="complex128")
         initial_state[0] = 1
 
         for op in qc.get_operations():
-            initial_state = np.dot(op.get_circuit_unitary(n_qbits),initial_state)
+            initial_state = op.get_circuit_unitary(n_qbits).dot(initial_state)
 
         return initial_state
 
@@ -27,7 +28,7 @@ class Simulator():
         """
         np.random.seed(seed)
         statevector = self.get_statevector(qc)
-        sum_probabilities = np.cumsum(np.multiply(statevector.conjugate(),statevector))
+        sum_probabilities = np.cumsum(statevector.multiply(statevector.conjugate()).toarray())
 
         #output_counts = {}
 

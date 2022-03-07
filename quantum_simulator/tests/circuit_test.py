@@ -1,5 +1,7 @@
 import pytest
 import numpy as np
+import scipy.sparse as sparse
+import scipy.sparse.linalg as linalg
 from quantum_simulator.simulator import Simulator
 from quantum_simulator.circuit import QuantumCircuit
 """
@@ -16,9 +18,9 @@ def test_h():
     qc.h(0)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([0.70710678+0.j, 0.70710678+0.j])
+    ans = sparse.coo_matrix(np.array([0.70710678+0.j, 0.70710678+0.j])).todok().T
 
-    assert np.abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_y():
     """
@@ -31,9 +33,9 @@ def test_y():
     qc.y(0)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([0.-0.70710678j, 0.+0.70710678j])
+    ans = sparse.coo_matrix(np.array([0.-0.70710678j, 0.+0.70710678j])).todok().T
 
-    assert np.abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_x():
     """
@@ -45,9 +47,9 @@ def test_x():
     qc.x(0)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([0, 1.+0.j])
+    ans = sparse.coo_matrix(np.array([0, 1.+0.j])).todok().T
 
-    assert np.abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_z():
     """
@@ -60,9 +62,9 @@ def test_z():
     qc.z(0)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([ 0.70710678+0.j, -0.70710678+0.j])
+    ans = sparse.coo_matrix([ 0.70710678+0.j, -0.70710678+0.j]).todok().T
 
-    assert np.abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_bell_2q():
     """
@@ -75,9 +77,9 @@ def test_bell_2q():
     qc.cx(0,1)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([0.70710678+0.j, 0, 0, 0.70710678+0.j])
+    ans = sparse.coo_matrix([0.70710678+0.j, 0, 0, 0.70710678+0.j]).todok().T
 
-    assert np.abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_bell_3q():
     """
@@ -91,9 +93,9 @@ def test_bell_3q():
     qc.cx(0,2)
 
     sv = simulator.get_statevector(qc)
-    ans = np.array([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0.70710678+0.j])
+    ans = sparse.coo_matrix([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0.70710678+0.j]).todok().T
 
-    assert abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_cx():
     """
@@ -108,11 +110,11 @@ def test_cx():
     sv = simulator.get_statevector(qc)
     print(sv)
 
-    ans = np.array([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ans = sparse.coo_matrix([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0.70710678+0.j, 0, 0, 0, 0, 0,
-                    0, 0, 0, 0, 0, 0])
+                    0, 0, 0, 0, 0, 0]).todok().T
 
-    assert abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_cz():
     """
@@ -128,12 +130,12 @@ def test_cz():
     sv = simulator.get_statevector(qc)
     print(sv)
 
-    ans = np.array([ 0.5+0.j,  0,  0,  0,  0.5+0.j,  0, 0,  0,  0,  0,  0,  0,
+    ans = sparse.coo_matrix([0.5+0.j,  0,  0,  0,  0.5+0.j,  0, 0,  0,  0,  0,  0,  0,
                      0, 0,  0,  0,  0.5+0.j,  0, 0,  0, -0.5+0.j,  0,  0,  0,
                      0, 0, 0, 0, 0, 0, 0, 0]
-            )
+            ).todok().T
 
-    assert abs(np.linalg.norm(sv-ans)) <= 0.001
+    assert abs(linalg.norm(sv-ans)) <= 0.001
 
 def test_simulation_1():
     """
