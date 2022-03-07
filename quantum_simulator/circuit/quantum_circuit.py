@@ -1,6 +1,8 @@
+import more_itertools
+import networkx as nx
 import numpy as np
-import gates
-from gates import Gate
+from quantum_simulator.circuit import gates
+from quantum_simulator.circuit import Gate
 
 """
 Class for quantum circuit representation
@@ -11,6 +13,7 @@ class QuantumCircuit():
         self.operations = []
         self.qbits = qbits
         self.cbits = cbits
+        self.dag = None
 
     def add_gate(self, gate: Gate):
         self.operations.append(gate)
@@ -57,8 +60,29 @@ class QuantumCircuit():
     def get_operations(self):
         return self.operations
 
-    def draw(self):
-        circuit = ''
+    def to_dag(self):
+        self.dag = nx.DiGraph()
 
-        for op in operations:
-            pass
+        edges = [['q_{}'.format(i)] for i in range(self.qbits)]
+
+        count = 0
+        for idx, op in enumerate(self.operations):
+            qubits = op.get_qbits()
+            name = '{}_{}'.format(op.get_name(), count)
+            count += 1
+
+            for i in qubits:
+                edges[i].append(name)
+
+        for i in range(self.qbits):
+            edges[i].append('c_{}'.format(i))
+
+        edges = [list(more_itertools.pairwise(line)) for line in edges] 
+        edges = [item for sublist in edges for item in sublist]
+        
+        self.dag.add_edges_from(edges)
+        return self.dag
+
+    def draw_dag(self):
+        nx.draw(self.dag, with_labels=True)
+        plt.show()
