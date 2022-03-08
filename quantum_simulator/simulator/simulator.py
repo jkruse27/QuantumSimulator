@@ -36,13 +36,6 @@ class Simulator():
         values = [next(x for x, val in enumerate(sum_probabilities) if val > n) for n in random_numbers]
         output_counts = {index: values.count(index) for index in set(values)}
 
-        #for i in range(shots):
-        #    random_number = random.random()
-        #    value = next(x for x, val in enumerate(sum_probabilities)
-        #                               if val > random_number) 
-
-        #    output_counts[value] = output_counts.get(value, 0) + 1
-
         keys = list(output_counts.keys())
 
         for key in keys:

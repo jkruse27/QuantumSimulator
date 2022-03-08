@@ -1,6 +1,7 @@
 import more_itertools
 import networkx as nx
 import numpy as np
+import scipy.sparse as sparse
 from quantum_simulator.circuit import gates
 from quantum_simulator.circuit import Gate
 
@@ -54,6 +55,9 @@ class QuantumCircuit():
     def u3(self, qbit: int, lambda_: float, phi: float, theta: float):
         self.operations.append(gates.U3([qbit], lambda_, phi, theta))
 
+    def unitary(self, qbits: list[int], unitary: sparse.dok_matrix):
+        self.operations.append(gates.UnitaryGate(unitary, qbits))
+
     def get_number_of_qubits(self):
         return self.qbits
 
@@ -82,6 +86,10 @@ class QuantumCircuit():
         
         self.dag.add_edges_from(edges)
         return self.dag
+
+    def compose(self, qc):
+        if(self.qbits == qc.get_number_of_qubits()):
+            self.operations += qc.get_operations()
 
     def draw_dag(self):
         nx.draw(self.dag, with_labels=True)

@@ -1,6 +1,7 @@
 import functools as ft
 import numpy as np
 import scipy.sparse as sparse
+from quantum_simulator.utils import isconsecutive
 
 """
 Quantum Gates
@@ -37,6 +38,30 @@ class Gate:
 
     def get_name(self) -> str:
         return self.name
+
+class UnitaryGate(Gate):
+    def __init__(self, unitary: sparse.dok_matrix, qbits: list[int], cbits: list[int] = None, **kwargs):
+        if(not isconsecutive(qbits)):
+            raise Exception("The qubits must be consecutives") 
+        
+        self.name = 'Unitary'
+        self.unitary = unitary
+
+        self.qbits = qbits
+        self.cbits = cbits
+
+    def get_circuit_unitary(self, n_qbits: int) -> sparse.dok_matrix:
+        if(n_qbits < len(self.qbits)):
+            raise Exception("Unitary's size is incompatible with the system") 
+
+        identity = I([],[]).get_unitary()
+        unitary  = self.unitary
+
+        operations = [identity]*(n_qbits-len(self.qbits)+1)
+        operations[self.qbits[0]] = unitary
+
+        return ft.reduce(lambda x, y: sparse.kron(x, y), operations[::-1])
+        
 
 class I(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
