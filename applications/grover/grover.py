@@ -43,7 +43,7 @@ def diffuser(n_qubits):
     return qc
 
 n = 7
-searched_state = 43
+searched_state = 42
 
 qc = QuantumCircuit(n)
 qc.compose(superposition(n))
@@ -53,6 +53,8 @@ repetitions = int(np.pi/4*np.sqrt(2**n))
 for i in range(repetitions):
     qc.compose(oracle(n, searched_state))
     qc.compose(diffuser(n))
+
+qc.measure(list(range(n)))
 
 simulator = Simulator()
 

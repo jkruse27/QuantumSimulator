@@ -15,6 +15,7 @@ class QuantumCircuit():
         self.qbits = qbits
         self.cbits = cbits
         self.dag = None
+        self.measured = 0
 
     def add_gate(self, gate: Gate):
         self.operations.append(gate)
@@ -57,6 +58,13 @@ class QuantumCircuit():
 
     def unitary(self, qbits: list[int], unitary: sparse.dok_matrix):
         self.operations.append(gates.UnitaryGate(unitary, qbits))
+
+    def measure(self, qbits: list[int]):
+        self.measured = len(qbits)
+        self.operations.append(gates.Measurement(qbits))
+
+    def get_measured_qubits(self):
+        return self.measured if self.measured != 0 else self.qbits
 
     def get_number_of_qubits(self):
         return self.qbits

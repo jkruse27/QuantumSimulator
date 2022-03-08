@@ -1,3 +1,4 @@
+import itertools
 import functools as ft
 import numpy as np
 import scipy.sparse as sparse
@@ -28,7 +29,6 @@ class Gate:
         operations[self.qbits[0]] = unitary
 
         return ft.reduce(lambda x, y: sparse.kron(x, y), operations[::-1])
-        #return ft.reduce(lambda x, y: sparse.kron(x, y), operations)
 
     def get_qbits(self) -> sparse.dok_matrix:
         return self.qbits
@@ -62,6 +62,33 @@ class UnitaryGate(Gate):
 
         return ft.reduce(lambda x, y: sparse.kron(x, y), operations[::-1])
         
+class ControlledUnitary(Gate):
+    def __init__(self, unitary: sparse.dok_matrix, qbits: list[int], cbits: list[int] = None, **kwargs):
+        if(not isconsecutive(qbits[1:])):
+            raise Exception("The qubits must be consecutives") 
+        
+        self.name = 'CUnitary'
+        self.unitary = unitary
+        self.qbits = qbits
+        self.cbits = cbits
+
+    def get_circuit_unitary(self, n_qbits: int) -> sparse.dok_matrix:
+        if(n_qbits < len(self.qbits)):
+            raise Exception("Unitary's size is incompatible with the system") 
+
+        identity = I([],[]).get_unitary()
+        unitary  = self.unitary
+        
+        operations_zero = [identity]*(n_qbits-len(self.qbits)+2)
+        operations_zero[self.qbits[0]] = ket_zero*ket_zero.T
+        
+        operations_one = [identity]*(n_qbits-len(self.qbits)+2)
+        operations_one[self.qbits[0]] = ket_one*ket_one.T
+        operations_one[self.qbits[1]] = unitary
+
+        return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero[::-1]) + \
+                ft.reduce(lambda x, y: sparse.kron(x, y), operations_one[::-1])
+
 
 class I(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
@@ -166,8 +193,6 @@ class CX(Gate):
 
         return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero[::-1]) + \
                 ft.reduce(lambda x, y: sparse.kron(x, y), operations_one[::-1])
-        #return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero) + \
-        #       ft.reduce(lambda x, y: sparse.kron(x, y), operations_one)
 
 class SWAP(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
@@ -202,12 +227,27 @@ class CZ(Gate):
 
         return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero[::-1]) + \
                 ft.reduce(lambda x, y: sparse.kron(x, y), operations_one[::-1])
-        #return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero) + \
-        #       ft.reduce(lambda x, y: sparse.kron(x, y), operations_one)
 
 class Measurement(Gate):
-    def __init__(self, qbits: list[int], cbits: list[int], **kwargs):
+    def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
+        if(min(qbits) < 0):
+            raise Exception("Invalid qubits") 
+
         self.name = 'MEASUREMENT'
         self.unitary = None
         self.qbits = qbits
         self.cbits = cbits
+        
+    def get_measured_superposition(self, n_qbits: int, statevector: sparse.dok_matrix) -> sparse.dok_matrix:
+        if(max(self.qbits) > n_qbits):
+            raise Exception("Measured qubits out of range") 
+       
+        qbits = [n_qbits-1-qbit for qbit in self.qbits][::-1]
+        superposition = sparse.lil_matrix((2**len(qbits),1))
+        cx = sparse.coo_matrix(statevector)
+
+        for i,j,v in zip(cx.row, cx.col, cx.data):
+            index = int("".join(np.array(list(format(i,'0{}b'.format(n_qbits))))[qbits]), 2) 
+            superposition[index,j] += abs(v)**2  
+
+        return superposition.power(1/2).todok()

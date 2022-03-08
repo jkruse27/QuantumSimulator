@@ -17,7 +17,11 @@ class Simulator():
         initial_state[0] = 1
 
         for op in qc.get_operations():
-            initial_state = op.get_circuit_unitary(n_qbits).dot(initial_state)
+            if(op.get_name() == 'MEASUREMENT'):
+                initial_state = op.get_measured_superposition(n_qbits, initial_state)
+                break
+            else:
+                initial_state = op.get_circuit_unitary(n_qbits).dot(initial_state)
 
         return initial_state
 
@@ -30,8 +34,6 @@ class Simulator():
         statevector = self.get_statevector(qc)
         sum_probabilities = np.cumsum(statevector.multiply(statevector.conjugate()).toarray())
 
-        #output_counts = {}
-
         random_numbers = np.random.rand(shots)
         values = [next(x for x, val in enumerate(sum_probabilities) if val > n) for n in random_numbers]
         output_counts = {index: values.count(index) for index in set(values)}
@@ -39,8 +41,6 @@ class Simulator():
         keys = list(output_counts.keys())
 
         for key in keys:
-            output_counts[format(key, '0{}b'.format(qc.get_number_of_qubits()))] = output_counts.pop(key)
+            output_counts[format(key, '0{}b'.format(qc.get_measured_qubits()))] = output_counts.pop(key)
 
         return output_counts
-
-
