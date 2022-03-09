@@ -8,6 +8,9 @@ import scipy.sparse as sparse
 from quantum_simulator.circuit import QuantumCircuit
 
 class Simulator():
+    def __init__(self, seed: int=42):
+        np.random.seed(seed) 
+
     def get_statevector(self, qc: QuantumCircuit):
         """
         Method that find the resulting statevector from a quantum circuit and returns it.
@@ -25,12 +28,11 @@ class Simulator():
 
         return initial_state
 
-    def simulate(self, qc: QuantumCircuit, shots: int=1024, seed: int=124):
+    def simulate(self, qc: QuantumCircuit, shots: int=1024):
         """
         Method that simulates measurements given a circuit and a number of shots. Returns a dictionary
         with counts of the measured states.
         """
-        np.random.seed(seed)
         statevector = self.get_statevector(qc)
         sum_probabilities = np.cumsum(statevector.multiply(statevector.conjugate()).toarray())
 

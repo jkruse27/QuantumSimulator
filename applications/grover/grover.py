@@ -42,7 +42,7 @@ def diffuser(n_qubits):
 
     return qc
 
-n = 7
+n = 8
 searched_state = 42
 
 qc = QuantumCircuit(n)

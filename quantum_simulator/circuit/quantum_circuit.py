@@ -56,8 +56,14 @@ class QuantumCircuit():
     def u3(self, qbit: int, lambda_: float, phi: float, theta: float):
         self.operations.append(gates.U3([qbit], lambda_, phi, theta))
 
+    def cu1(self, control: int, target: int, lambda_: float):
+        self.operations.append(gates.CU1([control, target], lambda_))
+
     def unitary(self, qbits: list[int], unitary: sparse.dok_matrix):
         self.operations.append(gates.UnitaryGate(unitary, qbits))
+
+    def controlled_unitary(self, control: int, targets: list[int], unitary: sparse.dok_matrix):
+        self.operations.append(gates.ControlledUnitary(unitary, [control]+targets))
 
     def measure(self, qbits: list[int]):
         self.measured = len(qbits)
@@ -102,3 +108,12 @@ class QuantumCircuit():
     def draw_dag(self):
         nx.draw(self.dag, with_labels=True)
         plt.show()
+
+    def to_unitary(self):
+        unitary = self.operations[0].get_circuit_unitary(self.qbits)
+    
+        for op in self.operations[1:]:
+            unitary = op.get_circuit_unitary(self.qbits).dot(unitary)
+
+        return unitary
+

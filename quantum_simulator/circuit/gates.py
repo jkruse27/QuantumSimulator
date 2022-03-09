@@ -78,8 +78,8 @@ class ControlledUnitary(Gate):
 
         identity = I([],[]).get_unitary()
         unitary  = self.unitary
-        
-        operations_zero = [identity]*(n_qbits-len(self.qbits)+2)
+       
+        operations_zero = [identity]*n_qbits
         operations_zero[self.qbits[0]] = ket_zero*ket_zero.T
         
         operations_one = [identity]*(n_qbits-len(self.qbits)+2)
@@ -147,16 +147,19 @@ class T(Gate):
         self.cbits = cbits
 
 class U1(Gate):
-    def __init__(self, qbits: list[int], lambda_: float, phi: float, theta: float, cbits: list[int] = None, **kwargs):
+    def __init__(self, qbits: list[int], lambda_: float, cbits: list[int] = None, **kwargs):
         self.name = 'U1'
+        self.lambda_ = lambda_
         self.unitary = sparse.dok_matrix([[1,  0],
                                           [0, np.exp(1.j*self.lambda_)]])
         self.qbits = qbits
         self.cbits = cbits
 
 class U2(Gate):
-    def __init__(self, qbits: list[int], lambda_: float, phi: float, theta: float, cbits: list[int] = None, **kwargs):
+    def __init__(self, qbits: list[int], lambda_: float, phi: float, cbits: list[int] = None, **kwargs):
         self.name = 'U2'
+        self.lambda_ = lambda_
+        self.phi = phi
         self.unitary = (1/np.sqrt(2))*sparse.dok_matrix([[1,                   -np.exp(1.j*self.lambda_)],
                                                          [np.exp(1.j*self.phi), np.exp(1.j*(self.phi+self.lambda_))]])
         self.qbits = qbits
@@ -165,10 +168,36 @@ class U2(Gate):
 class U3(Gate):
     def __init__(self, qbits: list[int], lambda_: float, phi: float, theta: float, cbits: list[int] = None, **kwargs):
         self.name = 'U3'
+        self.lambda_ = lambda_
+        self.phi = phi
+        self.theta = theta
         self.unitary = sparse.dok_matrix([[np.cos(self.theta/2),  -np.exp(1.j*self.lambda_)*np.sin(self.theta/2)],
                                           [np.exp(1.j*self.phi)*np.sin(self.theta/2), np.exp(1.j*(self.phi+self.lambda_))*np.cos(self.theta/2)]])
         self.qbits = qbits
         self.cbits = cbits
+
+class CU1(Gate):
+    def __init__(self, qbits: list[int], lambda_: float, cbits: list[int] = None, **kwargs):
+        self.name = 'CU1'
+        self.lambda_ = lambda_
+        self.unitary = sparse.dok_matrix([[1,  0],
+                                          [0, np.exp(1.j*self.lambda_)]])
+        self.qbits = qbits
+        self.cbits = cbits
+
+    def get_circuit_unitary(self, n_qbits: int) -> sparse.dok_matrix:
+        identity = I([],[]).get_unitary()
+        unitary  = self.get_unitary()
+        
+        operations_zero = [identity]*n_qbits
+        operations_zero[self.qbits[0]] = ket_zero*ket_zero.T
+        
+        operations_one = [identity]*n_qbits
+        operations_one[self.qbits[0]] = ket_one*ket_one.T
+        operations_one[self.qbits[1]] = unitary
+
+        return ft.reduce(lambda x, y: sparse.kron(x, y), operations_zero[::-1]) + \
+                ft.reduce(lambda x, y: sparse.kron(x, y), operations_one[::-1])
 
 class CX(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
@@ -203,6 +232,15 @@ class SWAP(Gate):
                                           [0, 0, 0, 1]])
         self.qbits = qbits
         self.cbits = cbits
+
+    def get_circuit_unitary(self, n_qbits: int) -> sparse.dok_matrix:
+        cx_12 = CX(self.qbits)
+        cx_21 = CX(self.qbits[::-1])
+
+        cx_12 = cx_12.get_circuit_unitary(n_qbits)
+        cx_21 = cx_21.get_circuit_unitary(n_qbits)
+
+        return cx_12.dot(cx_21.dot(cx_12)).T
 
 class CZ(Gate):
     def __init__(self, qbits: list[int], cbits: list[int] = None, **kwargs):
