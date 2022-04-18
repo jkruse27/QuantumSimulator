@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import scipy.sparse as sparse
 import scipy.sparse.linalg as linalg
+from quantum_simulator.representations import Unitary
 from quantum_simulator.simulator import Simulator
 from quantum_simulator.circuit import QuantumCircuit
 """
@@ -18,7 +19,7 @@ def test_h():
     qc.h(0)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix(np.array([0.70710678+0.j, 0.70710678+0.j])).todok().T
+    ans = Unitary.get_unitary(np.array([0.70710678+0.j, 0.70710678+0.j])).T
 
     assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
@@ -33,7 +34,7 @@ def test_y():
     qc.y(0)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix(np.array([0.-0.70710678j, 0.+0.70710678j])).todok().T
+    ans = Unitary.get_unitary(np.array([0.-0.70710678j, 0.+0.70710678j])).T
 
     assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
@@ -47,7 +48,7 @@ def test_x():
     qc.x(0)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix(np.array([0, 1.+0.j])).todok().T
+    ans = Unitary.get_unitary(np.array([0, 1.+0.j])).T
 
     assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
@@ -62,6 +63,6 @@ def test_z():
     qc.z(0)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix([ 0.70710678+0.j, -0.70710678+0.j]).todok().T
+    ans = Unitary.get_unitary([ 0.70710678+0.j, -0.70710678+0.j]).T
 
     assert np.abs(linalg.norm(sv-ans)) <= 0.001

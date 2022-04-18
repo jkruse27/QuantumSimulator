@@ -2,6 +2,7 @@ import pytest
 import numpy as np
 import scipy.sparse as sparse
 import scipy.sparse.linalg as linalg
+from quantum_simulator.representations import Unitary
 from quantum_simulator.simulator import Simulator
 from quantum_simulator.circuit import QuantumCircuit
 """
@@ -19,7 +20,7 @@ def test_bell_2q():
     qc.cx(0,1)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix([0.70710678+0.j, 0, 0, 0.70710678+0.j]).todok().T
+    ans = Unitary.get_unitary([0.70710678+0.j, 0, 0, 0.70710678+0.j]).T
 
     assert np.abs(linalg.norm(sv-ans)) <= 0.001
 
@@ -35,6 +36,6 @@ def test_bell_3q():
     qc.cx(0,2)
 
     sv = simulator.get_statevector(qc)
-    ans = sparse.coo_matrix([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0.70710678+0.j]).todok().T
+    ans = Unitary.get_unitary([0.70710678+0.j, 0, 0, 0, 0, 0, 0, 0.70710678+0.j]).T
 
     assert abs(linalg.norm(sv-ans)) <= 0.001

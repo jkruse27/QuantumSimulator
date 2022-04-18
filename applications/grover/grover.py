@@ -5,6 +5,7 @@ sys.path.insert(0, path)
 
 import scipy.sparse as sparse
 import numpy as np
+from quantum_simulator.representations import Unitary
 from quantum_simulator.simulator import Simulator
 from quantum_simulator.circuit import QuantumCircuit
 
@@ -22,7 +23,7 @@ def oracle(n_qubits, marked_state):
     diagonal = np.ones(2**n_qubits)
     diagonal[marked_state] = -1
 
-    unitary = sparse.diags(diagonal, format='dok')
+    unitary = Unitary.get_unitary(np.diag(diagonal))
     qc.unitary(list(range(n_qubits)), unitary)
 
     return qc
@@ -35,7 +36,7 @@ def diffuser(n_qubits):
     diagonal = np.ones(2**n_qubits)
     diagonal[0] = -1
 
-    unitary = sparse.diags(diagonal, format='dok')
+    unitary = Unitary.get_unitary(np.diag(diagonal))
     qc.unitary(list(range(n_qubits)), unitary)
 
     qc.compose(superposition(n_qubits))

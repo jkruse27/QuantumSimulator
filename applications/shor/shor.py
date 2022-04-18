@@ -28,7 +28,6 @@ def iqft(l):
     for i in range(l):
         qc.h(i)
         for j in range(i+1, l):
-            print(-np.pi/(2**(j-i)))
             qc.cu1(i, j, -np.pi/(2**(j-i)))
     
     return qc

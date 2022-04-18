@@ -2,6 +2,7 @@ import more_itertools
 import networkx as nx
 import numpy as np
 import scipy.sparse as sparse
+from quantum_simulator.representations import Unitary
 from quantum_simulator.circuit import gates
 from quantum_simulator.circuit import Gate
 
@@ -59,7 +60,7 @@ class QuantumCircuit():
     def cu1(self, control: int, target: int, lambda_: float):
         self.operations.append(gates.CU1([control, target], lambda_))
 
-    def unitary(self, qbits: list[int], unitary: sparse.dok_matrix):
+    def unitary(self, qbits: list[int], unitary: Unitary):
         self.operations.append(gates.UnitaryGate(unitary, qbits))
 
     def controlled_unitary(self, control: int, targets: list[int], unitary: sparse.dok_matrix):
