@@ -179,9 +179,9 @@ $$p(1) = p(|01\rangle)+p(|11\rangle) = 0,25+0,30 = 0,55$$
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Circuitos quânticos podem ser vistos como grafos direcionados acíclicos, nos quais os vértices representam portas quânticas e as arestas dependências entre qubits [6]. Usando essa representação, podemos definir ainda camadas do circuito, sendo a primeira camada o conjunto de vértices sem predecessores. Removendo a primeira camada, podemos aplicar a mesma definição no circuito resultante para obter a segunda, e assim sucessivamente. Unindo esse conhecimento com o de formulação de portas em sistemas com múltiplos qubits, vemos que podemos aplicar todas as portas de uma mesma camada paralelamente criando uma única unitária, caso assim desejemos. A Figura 2 mostra um exemplo do paralelo entre o circuito quântico e o DAG.  
 
 <p align="center">
-  <img width="200" src="https://www.researchgate.net/publication/362385758/figure/fig1/AS:1184103818891264@1659323758053/The-Quantum-circuit-and-DAG-of-decomposed-Toffoli-gate_W640.jpg">
-<b>Figura 2: Paralelo entre um circuito quântico e seu DAG equivalente. Adaptado de [7]</b>
-</p>        
+  <img src="https://github.com/jkruse27/QuantumSimulator/blob/main/images/The-Quantum-circuit-and-DAG-of-decomposed-Toffoli-gate.png">
+</p>    
+<p align= "center"><b>Figura 2: Paralelo entre um circuito quântico e seu DAG equivalente. Adaptado de [7]</b></p>
     
 ### Otimizações
 #### Matrizes Esparsas
@@ -194,16 +194,12 @@ $$p(1) = p(|01\rangle)+p(|11\rangle) = 0,25+0,30 = 0,55$$
             
 #### Identidades
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Outra forma de simplificar e acelerar a simulação do circuito é reduzindo o número de operações aplicadas. Isso pode ser feito identificando identidades nos circuitos e substituindo-as por relações de equivalência mais simples [9,10,11]. A implementação dessa etapa envolve uma análise do circuito em sua representação como grafo, a comparação da sequência das portas com equivalências pré-definidas em código já e então sua substituição pela sequência reduzida de portas, como foi feito em [12]. A figura 3 exemplifica algumas das possíveis substituições.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Outra forma de simplificar e acelerar a simulação do circuito é reduzindo o número de operações aplicadas. Isso pode ser feito identificando identidades nos circuitos e substituindo-as por relações de equivalência mais simples [9,10,11]. A implementação dessa etapa envolve uma análise do circuito em sua representação como grafo, a comparação da sequência das portas com equivalências pré-definidas em código já e então sua substituição pela sequência reduzida de portas, como foi feito em [12]. A Figura 3 exemplifica algumas das possíveis substituições.
     
-            \begin{figure}[H]
-              \begin{center}
-                \centering
-                \includegraphics[width=\columnwidth]{images/FIG-A13-Circuit-identities-The-circuit-in-a-implements-the-controlled-RyphZ.png}
-              \caption{Figura 3: Exemplos de equivalências entre circuitos quânticos. Adaptado de [13]}
-              \label{fig:identity}
-              \end{center}
-            \end{figure}  
+<p align="center">
+  <img src="https://github.com/jkruse27/QuantumSimulator/blob/main/images/FIG-A13-Circuit-identities-The-circuit-in-a-implements-the-controlled-RyphZ.png">
+</p>    
+<p align= "center"><b>Figura 3: Exemplos de equivalências entre circuitos quânticos. Adaptado de [13]</b></p>
     
 ### Compilador
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Para simplificar a implementação e simulação de circuitos quânticos, foi também colocado um interpretador de código em OpenQASM, uma linguagem de interface que permite a descrição de circuitos de pouca profundidade [14]. Isso permite que o usuário crie e execute seus programas sem precisar criar um código em python correspondente, já que o compilador se responsabiliza pela conversão do código para o formato de QuantumCircuit que será usado na simulação.
